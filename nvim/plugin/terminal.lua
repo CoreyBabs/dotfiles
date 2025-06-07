@@ -50,8 +50,10 @@ local function toggle_terminal()
 end
 
 local function close_terminal()
-	vim.api.nvim_win_close(state.floating.win, true)
-	state.floating = { buf = -1, win = -1 }
+		if vim.api.nvim_win_is_valid(state.floating.win) and vim.bo[state.floating.buf].buftype == "terminal" then
+			vim.api.nvim_win_close(state.floating.win, true)
+			state.floating = { buf = -1, win = -1 }
+		end
 end
 
 vim.api.nvim_create_user_command("Terminal", toggle_terminal, {})
@@ -59,4 +61,4 @@ vim.api.nvim_create_user_command("CloseTerminal", close_terminal, {})
 
 vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
 vim.keymap.set({"n", "t"}, "<space>tt", toggle_terminal, { desc = "[T]erminal [T]oggle"})
-vim.keymap.set("t", "<space>tc", close_terminal, { desc = "[T]erminal [C]lose"})
+vim.keymap.set({"n", "t"}, "<space>tc", close_terminal, { desc = "[T]erminal [C]lose"})
